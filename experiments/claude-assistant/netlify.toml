@@ -1,0 +1,7 @@
+[build]
+  command = "pnpm build"
+  publish = ".next"
+  base = "experiments/claude-assistant"
+
+[[plugins]]
+  package = "@netlify/next"
