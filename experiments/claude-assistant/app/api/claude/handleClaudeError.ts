@@ -16,7 +16,7 @@ export async function handleClaudeError(
       { reply: `Erreur API: ${message}` },
       { status: 500 }
     );
-  } catch (e) {
+  } catch {
     return NextResponse.json(
       {
         reply: `Erreur API avec code ${response.status}: ${errorText.slice(

@@ -1,13 +1,15 @@
-export function parseClaudeResponse(data: any): string {
-  if (Array.isArray(data.content)) {
-    return data.content.map((c: any) => c.text).join("\n");
+import { ClaudeResponse } from "@/app/types/claude";
+
+export function parseClaudeResponse(data: ClaudeResponse): string {
+  if ("content" in data && Array.isArray(data.content)) {
+    return data.content.map((c) => c.text).join("\n");
   }
 
-  if (data.completion) {
+  if ("completion" in data) {
     return data.completion;
   }
 
-  if (data.error) {
+  if ("error" in data) {
     throw new Error(data.error.message || "Erreur Claude");
   }
 
