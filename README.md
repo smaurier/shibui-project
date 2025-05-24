@@ -1,6 +1,6 @@
 # Shibui Project
 
-🧪 Espace d’expérimentations techniques autour de l’application Shibui Project.  
+🧪 Espace d’expérimentations techniques autour du Shibui Project.  
 Ce dépôt regroupe des tests d’intégration IA, des composants UI, des prototypes narratifs, et d’autres explorations.
 
 ## 🧱 Structure
