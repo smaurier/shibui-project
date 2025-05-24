@@ -4,4 +4,4 @@
   base = "experiments/claude-assistant"
 
 [[plugins]]
-  package = "@netlify/next"
+  package = "@netlify/plugin-nextjs"

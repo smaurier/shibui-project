@@ -24,6 +24,9 @@ importers:
       '@netlify/next':
         specifier: ^1.4.9
         version: 1.4.9(next@15.1.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+      '@netlify/plugin-nextjs':
+        specifier: ^5.11.2
+        version: 5.11.2
       '@types/node':
         specifier: ^20
         version: 20.17.50
@@ -257,6 +260,10 @@ packages:
     engines: {node: '>=12.0.0'}
     peerDependencies:
       next: '>=12.2.0'
+
+  '@netlify/plugin-nextjs@5.11.2':
+    resolution: {integrity: sha512-9Hgd/J5nP2U/Vv0teytq9uUAGppiKV9t5tzpsuMLqeqUGD9STxXwKmyZd2v8Z4THSW9rw4+8w7dH7LVlFoym2A==}
+    engines: {node: '>=18.0.0'}
 
   '@next/env@15.1.8':
     resolution: {integrity: sha512-Kd9zsi2ariJvtAvA5KapkzM/Qp9eXIcVqsuUMQHu9yYmhlGa9kyklf+6TQgVGSCbzsrApKCq9olyk51SmPnyLA==}
@@ -1988,6 +1995,8 @@ snapshots:
   '@netlify/next@1.4.9(next@15.1.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
     dependencies:
       next: 15.1.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+
+  '@netlify/plugin-nextjs@5.11.2': {}
 
   '@next/env@15.1.8': {}
 
