@@ -10,5 +10,5 @@ Ce dépôt regroupe des tests d’intégration IA, des composants UI, des protot
 
 ## 📌 Projets internes
 
-- `assistant-claude-v1` : assistant IA conversationnel avec Claude 3 (Next.js)
+- `claude-assistant` : assistant IA conversationnel avec Claude 3 (Next.js)
 - `rag-supabase` : test de moteur vectoriel local pour suggestions adaptées (à venir)
