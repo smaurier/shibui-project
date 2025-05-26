@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Moteur RAG local (Top-k avec UI)</title>
+  <script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.3.0';
+
+    function cosineSimilarity(a, b) {
+      const dot = a.reduce((sum, ai, i) => sum + ai * b[i], 0);
+      const normA = Math.sqrt(a.reduce((sum, ai) => sum + ai * ai, 0));
+      const normB = Math.sqrt(b.reduce((sum, bi) => sum + bi * bi, 0));
+      return dot / (normA * normB);
+    }
+
+    function searchTopK(queryVector, vectorBase, k = 3) {
+      const scored = vectorBase.map((doc) => {
+        const score = cosineSimilarity(queryVector, doc.vector);
+        return { ...doc, score };
+      });
+
+      scored.sort((a, b) => b.score - a.score);
+      return scored.slice(0, k);
+    }
+
+    const documents = [
+      "Aujourd'hui il fait très beau.",
+      "Je vais au travail en métro.",
+      "J'adore passer du temps en famille.",
+      "Il pleut souvent au printemps.",
+      "Regarder un film avec mes enfants me rend heureux."
+    ];
+
+    let vectorBase = [];
+    let extractor;
+    let lastTopK = [];
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const form = document.querySelector('#query-form');
+      const input = document.querySelector('#query-input');
+      const results = document.querySelector('#results');
+      const copyBtn = document.querySelector('#copy-prompt');
+
+      document.querySelector('#status').textContent = 'Chargement du modèle...';
+      extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+
+      vectorBase = await Promise.all(
+        documents.map(async (text) => {
+          const output = await extractor(text, { pooling: 'mean', normalize: true });
+          return { text, vector: output.data };
+        })
+      );
+
+      document.querySelector('#status').textContent = 'Modèle prêt. Pose ta question !';
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const question = input.value.trim();
+        if (!question) return;
+
+        results.innerHTML = '<p>Recherche en cours...</p>';
+        const queryEmbedding = (await extractor(question, { pooling: 'mean', normalize: true })).data;
+        const topResults = searchTopK(queryEmbedding, vectorBase, 3);
+        lastTopK = topResults; // Save for copy
+
+        results.innerHTML = '<h3>Résultats les plus pertinents :</h3>';
+        const list = document.createElement('ul');
+        topResults.forEach((res) => {
+          const li = document.createElement('li');
+          li.textContent = `${res.text}  (score: ${res.score.toFixed(4)})`;
+          list.appendChild(li);
+        });
+        results.appendChild(list);
+      });
+
+      copyBtn.addEventListener('click', () => {
+        if (lastTopK.length === 0) return alert("Fais d'abord une recherche !");
+        const context = lastTopK.map(r => `- ${r.text}`).join('\n');
+        const query = input.value.trim();
+        const prompt = `Voici quelques éléments de contexte :\n${context}\n\nEn te basant uniquement sur ces informations, réponds à la question suivante : ${query}`;
+        navigator.clipboard.writeText(prompt).then(() => {
+          alert("✅ Prompt copié dans le presse-papiers !");
+        });
+      });
+    });
+  </script>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 600px; margin: auto; background: #f7f7f7; }
+    input, button { padding: 0.5rem; font-size: 1rem; }
+    form { margin-bottom: 1rem; }
+    ul { list-style: disc; padding-left: 1.5rem; }
+    #copy-prompt { margin-top: 1rem; background: #333; color: #fff; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Moteur vectoriel local (Top-k)</h1>
+  <p id="status">Initialisation...</p>
+  <form id="query-form">
+    <input type="text" id="query-input" placeholder="Pose ta question ici..." size="40" required />
+    <button type="submit">Chercher</button>
+  </form>
+  <div id="results"></div>
+  <button id="copy-prompt">📋 Copier le prompt ( GPT, Claude etc.) </button>
+</body>
+</html>
