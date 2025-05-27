@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zeni - Test multilingue local</title>
+  <script>
+    async function buildPrompt() {
+      const input = document.getElementById('user-prompt').value.trim();
+      const lang = document.getElementById('lang-select').value;
+      const user = document.getElementById('user-name').value.trim();
+      const mood = document.getElementById('user-mood').value.trim();
+
+      const instructions = {
+        fr: `Tu es Zeni, un assistant familial bienveillant. Tu parles toujours en français. L'utilisateur s'appelle ${user || '...'} et il se sent ${mood || '...'} aujourd'hui.`,
+        en: `You are Zeni, a caring family assistant. You always respond in English. The user's name is ${user || '...'} and they are feeling ${mood || '...'} today.`,
+        es: `Eres Zeni, un asistente familiar amable. Siempre respondes en español. El usuario se llama ${user || '...'} y se siente ${mood || '...'} hoy.`
+      };
+
+      return `${instructions[lang]}\n${input}`;
+    }
+
+    async function queryMistral() {
+      const output = document.getElementById('zeni-reply');
+      const fullPrompt = await buildPrompt();
+      output.innerText = '⏳ Zeni réfléchit...';
+
+      try {
+        const res = await fetch('http://127.0.0.1:11434/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'mistral', prompt: fullPrompt, stream: true })
+        });
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let resultText = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n').filter(Boolean);
+          for (const line of lines) {
+            try {
+              const json = JSON.parse(line);
+              if (json.response) {
+                resultText += json.response;
+                output.value = resultText;
+              }
+            } catch (e) {
+              console.warn("Chunk JSON malformé:", line);
+            }
+          }
+        }
+
+      } catch (err) {
+        output.value = '❌ Erreur : Zeni est peut-être éteint (Ollama non lancé)';
+        console.error(err);
+      }
+    }
+
+    async function queryClaude() {
+      const output = document.getElementById('zeni-reply');
+      const fullPrompt = await buildPrompt();
+      output.innerText = '⏳ Zeni (Claude) réfléchit...';
+
+      try {
+        const res = await fetch('/api/claude', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: fullPrompt })
+        });
+        const data = await res.json();
+        output.value = data.reply || "(Pas de réponse)";
+      } catch (err) {
+        output.value = '❌ Erreur avec Claude';
+        console.error(err);
+      }
+    }
+  </script>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 600px; margin: auto; background: #f7f7f7; }
+    label, select, input, button { font-size: 1rem; margin-top: 0.5rem; display: block; width: 100%; padding: 0.5rem; }
+    textarea { width: 100%; margin-top: 1rem; min-height: 150px; padding: 1rem; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Zeni — Test multilingue (Mistral ou Claude)</h1>
+
+  <label for="lang-select">Choisir une langue :</label>
+  <select id="lang-select">
+    <option value="fr">Français</option>
+    <option value="en">English</option>
+    <option value="es">Español</option>
+  </select>
+
+  <label for="user-name">Nom de l'utilisateur :</label>
+  <input id="user-name" placeholder="Ex : Léo, Inès..." />
+
+  <label for="user-mood">Humeur actuelle :</label>
+  <input id="user-mood" placeholder="Ex : fatigué, stressé, joyeux..." />
+
+  <label for="user-prompt">Pose ta question à Zeni :</label>
+  <input id="user-prompt" placeholder="Ex : Que puis-je faire ce week-end avec mes enfants ?" />
+
+  <!-- <button onclick="queryMistral()">🧠 Demander à Zeni (Mistral)</button> -->
+  <button onclick="queryClaude()">🧠 Demander à Zeni (Claude)</button>
+
+  <textarea id="zeni-reply" readonly placeholder="Réponse de Zeni..."></textarea>
+</body>
+</html>
