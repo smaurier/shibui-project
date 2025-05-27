@@ -1,0 +1,41 @@
+body {
+  font-family: sans-serif;
+  padding: 2rem;
+  max-width: 700px;
+  margin: auto;
+  background: #f7f7f7;
+}
+
+label,
+input,
+select,
+button,
+textarea {
+  display: block;
+  margin-top: 1rem;
+  font-size: 1rem;
+  width: 100%;
+}
+
+button {
+  background-color: #333;
+  color: white;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+textarea {
+  resize: vertical;
+  padding: 0.5rem;
+  min-height: 120px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+ul {
+  margin-top: 1rem;
+  padding-left: 1.2rem;
+  background: #eaeaea;
+  border-radius: 5px;
+}

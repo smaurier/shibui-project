@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zeni UI (test)</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <h1>🧠 Interface de test — Zeni</h1>
+
+  <label>Langue :
+    <select id="lang">
+      <option value="fr">Français</option>
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </label>
+
+  <label>Nom :
+    <input id="user" placeholder="Ton prénom" />
+  </label>
+
+  <label>État d'esprit :
+    <input id="mood" placeholder="Ex : joyeux, stressé..." />
+  </label>
+
+  <label>Ta question :
+    <input id="query" placeholder="Pose ta question à Zeni" />
+  </label>
+
+  <button id="ask-btn">🧠 Demander à Zeni</button>
+
+  <label>Réponse de Zeni :</label>
+  <textarea id="zeni-reply" readonly></textarea>
+
+  <h2>🕘 Historique</h2>
+  <ul id="history-list"></ul>
+
+  <script type="module" src="./zeni-ui.js"></script>
+</body>
+</html>
